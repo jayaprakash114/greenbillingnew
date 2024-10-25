@@ -16,7 +16,7 @@ const ProductTable = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/items')
+    axios.get('https://greenbillingnew-api.vercel.app/items')
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
@@ -52,7 +52,7 @@ const ProductTable = () => {
     const total = price + gstAmount;
 
     try {
-      const response = await axios.post('http://localhost:5000/items', {
+      const response = await axios.post('https://greenbillingnew-api.vercel.app/items', {
         name: newProduct.name,
         price: price,
         gstPercentage: gstPercentage,
@@ -84,7 +84,7 @@ const ProductTable = () => {
     const total = price + gstAmount;
 
     try {
-      const response = await axios.put(`http://localhost:5000/items/${editProduct._id}`, {
+      const response = await axios.put(`https://greenbillingnew-api.vercel.app/items/${editProduct._id}`, {
         name: editProduct.name,
         price: price,
         gstPercentage: gstPercentage,
@@ -101,7 +101,7 @@ const ProductTable = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/items/${id}`);
+      await axios.delete(`https://greenbillingnew-api.vercel.app/items/${id}`);
       setProducts(prev => prev.filter(product => product._id !== id));
     } catch (error) {
       console.error('Error deleting product:', error.response ? error.response.data : error.message);
