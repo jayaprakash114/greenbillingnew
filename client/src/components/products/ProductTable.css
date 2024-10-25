@@ -1,0 +1,11 @@
+.productDetailsh2{
+    font-family: 'Arial', sans-serif; /* Choose a clean, professional font */
+    font-size: 1.5rem; /* Adjust size for logo impact */
+    font-weight: bold; /* Make the text bold */
+    color: #2c3e50; /* Choose a color that fits your brand, e.g., a dark blue */
+    letter-spacing: 0.1rem; /* Add some space between the letters */
+    text-transform: uppercase; /* Make all letters uppercase */
+    margin-top: 25px;
+    margin-left: 300px;
+    text-shadow:2px 2px 4px rgba(0, 0, 0, 0.3) ;
+ }

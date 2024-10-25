@@ -1,0 +1,327 @@
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import './MainContent.css';
+import { Button, Modal, Form } from 'react-bootstrap';
+
+const MainContent = () => {
+  const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+
+  const searchInputRef = useRef(null);
+  const printButtonRef = useRef(null);
+
+  // Define filteredProducts before the useEffect
+  const filteredProducts = products.filter(product => 
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    products.indexOf(product) + 1 === parseInt(searchQuery)
+  );
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/items')
+      .then(response => setProducts(response.data))
+      .catch(error => console.error('Error fetching products:', error));
+
+    const handleKeyPress = (e) => {
+      switch (e.key) {
+        case 'p':
+          if (printButtonRef.current) {
+            printButtonRef.current.click();
+          }
+          break;
+        case ' ':
+          if (searchInputRef.current) {
+            searchInputRef.current.focus();
+          }
+          break;
+        case '+':
+          if (selectedProducts.length > 0) {
+            const lastProduct = selectedProducts[selectedProducts.length - 1];
+            handleQuantityChange(lastProduct._id, lastProduct.quantity + 1);
+          }
+          break;
+        case '-':
+          if (selectedProducts.length > 0) {
+            const lastProduct = selectedProducts[selectedProducts.length - 1];
+            handleQuantityChange(lastProduct._id, lastProduct.quantity - 1);
+          }
+          break;
+        case 'Delete':
+        case 'Backspace':
+          if (selectedProducts.length > 0) {
+            handleRemoveClick(selectedProducts[selectedProducts.length - 1]._id);
+          }
+          break;
+        default:
+          if (!isNaN(e.key) && filteredProducts.length >= parseInt(e.key)) {
+            const index = parseInt(e.key) - 1;
+            handleProductClick(filteredProducts[index]);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [filteredProducts, selectedProducts]);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleProductClick = (product) => {
+    if (!selectedProducts.some(p => p._id === product._id)) {
+      setSelectedProducts(prev => [...prev, { ...product, quantity: 1 }]);
+    }
+  };
+
+  const handleRemoveClick = (productId) => {
+    setSelectedProducts(prev => prev.filter(p => p._id !== productId));
+  };
+
+  const handleQuantityChange = (productId, newQuantity) => {
+    setSelectedProducts(prev => prev.map(p =>
+      p._id === productId ? { ...p, quantity: Math.max(newQuantity, 1) } : p
+    ));
+  };
+
+  const totalAmount = selectedProducts.reduce((sum, product) =>
+    sum + (product.total * product.quantity), 0
+  ).toFixed(2);
+
+  const formatDateTime = (date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  };
+
+  const handleCreateBill = () => {
+    setShowModal(true);
+  };
+
+  const handleModalSubmit = () => {
+    if (!customerName || !contactNumber) {
+      alert('Please fill in all customer details.');
+      return;
+    }
+  
+    // Get the current date and time
+    const createdAt = new Date();
+    const createdAtAbuDhabi = new Date(createdAt.toLocaleString('en-US', { timeZone: 'Asia/Dubai' }));
+  
+    // Prepare the data to be stored in the database
+    const billData = {
+      customerName,
+      contactNumber,
+      selectedProducts,
+      totalAmount,
+      createdAt: createdAtAbuDhabi.toISOString(),
+      printDetails: generatePrintContent({
+        customerName,
+        contactNumber,
+        selectedProducts,
+        totalAmount,
+        createdAt: createdAtAbuDhabi
+      })
+    };
+  
+    console.log('Submitting Bill Data:', billData); // Debugging: Log bill data
+  
+    // Send the data to the backend to store it in the database
+    axios.post('http://localhost:5000/bills', billData)
+      .then(response => {
+        console.log('Bill stored successfully:', response.data);
+        
+        // Print the bill (optional)
+        handlePrint(billData);
+  
+        // Show success alert
+        alert('Bill created successfully!');
+  
+        // Reset form fields and selected products
+        setCustomerName('');
+        setContactNumber('');
+        setSelectedProducts([]);
+      })
+      .catch(error => {
+        console.error('Error storing bill:', error.response ? error.response.data : error.message);
+        alert('Failed to create bill. Please try again.');
+      });
+  
+    // Close the modal after submission
+    setShowModal(false);
+  };
+  
+  const handlePrint = (billData) => {
+    const printWindow = window.open('', '', 'height=600,width=800');
+    const printContent = generatePrintContent(billData);
+
+    printWindow.document.open();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
+  return (
+    <div className="main p-3">
+      <div className="container">
+        <div className="search-bar-container mb-3">
+          <div className="input-group mt-5">
+            <input
+              type="text"
+              className="form-control search-input"
+              placeholder="Search for a product by name or S.No..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              ref={searchInputRef}
+            />
+          </div>
+        </div>
+
+        <div className="product-list mb-3">
+          {filteredProducts.length > 0 ? (
+            <ul className="list-group">
+              {filteredProducts.map((product, index) => (
+                <li
+                  key={product._id}
+                  className="list-group-item list-group-item-action"
+                  onClick={() => handleProductClick(product)}
+                >
+                  {`${index + 1}. ${product.name}`}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No products found. Please try a different search.</p>
+          )}
+        </div>
+
+        <div className="selected-products">
+          <h5>Selected Products</h5>
+          {selectedProducts.length > 0 ? (
+            <>
+              <table className="table table-striped mb-3">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>GST Amount</th>
+                    <th>Total (per unit)</th>
+                    <th>Quantity</th>
+                    <th>Total for this Product</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedProducts.map(product => (
+                    <tr key={product._id}>
+                      <td>{product.name}</td>
+                      <td>₹{product.price.toFixed(2)}</td>
+                      <td>₹{product.gst.toFixed(2)}</td>
+                      <td>₹{product.total.toFixed(2)}</td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => handleQuantityChange(product._id, product.quantity - 1)}
+                            disabled={product.quantity <= 1}
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            className="form-control form-control-sm mx-2"
+                            value={product.quantity}
+                            min="1"
+                            onChange={(e) => handleQuantityChange(product._id, parseInt(e.target.value) || 1)}
+                          />
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => handleQuantityChange(product._id, product.quantity + 1)}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
+                      <td>₹{(product.total * product.quantity).toFixed(2)}</td>
+                      <td>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleRemoveClick(product._id)}
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td colSpan="6" className="text-end fw-bold">Total Amount:</td>
+                    <td>₹{totalAmount}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <Button
+                variant="primary"
+                onClick={handleCreateBill}
+                ref={printButtonRef}
+              >
+                Create Bill & Print
+              </Button>
+            </>
+          ) : (
+            <p>No products selected yet.</p>
+          )}
+        </div>
+      </div>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Enter Customer Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formCustomerName">
+              <Form.Label>Customer Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter customer name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="formContactNumber" className="mt-3">
+              <Form.Label>Contact Number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter contact number"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleModalSubmit}>
+            Submit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+};
+
+export default MainContent;

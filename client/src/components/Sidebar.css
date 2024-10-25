@@ -1,0 +1,95 @@
+.sidebar {
+  transform: translateX(-250px); /* Hide sidebar off-screen */
+}
+
+.sidebar.show {
+  transform: translateX(0); /* Show sidebar */
+}
+
+.sidebar.hide {
+  transform: translateX(-250px); /* Hide sidebar off-screen */
+}
+
+.custom-sidebar{
+  border-radius: 8px;
+}
+.customnav{
+  text-decoration: none;
+  font-weight:lighter;
+  font-Size: 1.5rem;
+  margin-top: 25px;
+  margin-left: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
+  font-family: 'Arial', sans-serif; /* Choose a clean, professional font */
+  
+}
+
+.li{
+  margin-right: 10px;
+}
+.logo {
+  font-family: 'Arial', sans-serif; /* Choose a clean, professional font */
+  font-size: 2rem; /* Adjust size for logo impact */
+  font-weight: bold; /* Make the text bold */
+  color: #2c3e50; /* Choose a color that fits your brand, e.g., a dark blue */
+  letter-spacing: 0.1rem; /* Add some space between the letters */
+  text-transform: uppercase; /* Make all letters uppercase */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
+  margin-left: -35px;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Sidebar.css */
+
+/* General styles for the sidebar */
+.sidebar {
+  background-color: #f8f9fa; /* Background color for the sidebar */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+  border-right: 1px solid #dee2e6; /* Optional: Adds a border on the right side */
+  padding: 1rem; /* Adds padding around the sidebar content */
+}
+
+/* Styles for the links in the sidebar */
+.customnav {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  text-decoration: none; /* Remove underline from links */
+  color: #000; /* Text color */
+  font-size: 18px; /* Font size */
+  transition: background-color 0.2s ease;
+  border-radius: 4px; /* Optional: Adds rounded corners */
+}
+
+/* Space between icon and text */
+.customnav .li {
+  margin-right: 10px; /* Adjusts space between icon and text */
+  color: #6c757d; /* Light color for icons */
+}
+
+/* Hover effect for links */
+.customnav:hover {
+  background-color: #e9ecef; /* Light background color on hover */
+}
+
+/* Hover effect for icons */
+.customnav:hover .li {
+  color: #000; /* Darker color for icons on hover */
+}
+
+/* Logo styling */
+
+/* Flex styling for icon and text alignment */
+.d-flex {
+  display: flex;
+  align-items: center;
+}
