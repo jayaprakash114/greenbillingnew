@@ -18,7 +18,7 @@ const BillPage = () => {
   useEffect(() => {
     const fetchBills = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/bills');
+        const response = await axios.get('https://greenbillingnew-api.vercel.app/bills');
         console.log('Fetched bills:', response.data);
         setBills(response.data);
         filterBills(selectedDate, searchTerm); // Filter bills with initial date
