@@ -19,7 +19,7 @@ const MainContent = () => {
   const printButtonRef = useRef(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/items')
+    axios.get('https://greenbillingnew-api.vercel.app/items')
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
 
@@ -110,7 +110,7 @@ const MainContent = () => {
       })
     };
     console.log(billData)
-    axios.post('http://localhost:5000/bills', billData)
+    axios.post('https://greenbillingnew-api.vercel.app/bills', billData)
       .then(response => {
         console.log('Bill stored successfully:', response.data);
         handlePrint(billData);
