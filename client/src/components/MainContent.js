@@ -217,16 +217,6 @@ margin-left:-10px;
        <div>
     <table border="0" cellspacing="0" cellpadding="0" style="width: 300px; margin-left:-25px">
         <tr>
-            <td style="text-align: left; width: 25%; padding: 0; margin-left: 10px;"><strong>Customer</strong></td>
-            <td style="text-align: left; width: 5%; padding: 0;">:</td>
-            <td style="text-align: left; width: 70%; padding: 0 0 0 5px;">${billData.customerName}</td>
-        </tr>
-        <tr>
-            <td style="text-align: left; width: 25%; padding: 0; margin-left: 10px;"><strong>Contact</strong></td>
-            <td style="text-align: left; width: 5%; padding: 0;">:</td>
-            <td style="text-align: left; width: 70%; padding: 0 0 0 5px;">${billData.contactNumber}</td>
-        </tr>
-        <tr>
             <td style="text-align: left; width: 25%; padding: 0; margin-left: 10px;"><strong>Employee Code</strong></td>
             <td style="text-align: left; width: 5%; padding: 0;">:</td>
             <td style="text-align: left; width: 70%; padding: 0 0 0 5px;">E${billData.selectedOption}</td>
